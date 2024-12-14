@@ -61,7 +61,9 @@ public class ProductService implements IProductService{
 	public void deleteProductById(Long id) {
 
 		productRepository.findById(id)
-		.ifPresentOrElse(productRepository::delete, ()->new ProductNotFoundException("Product  not found!"));
+		.ifPresentOrElse(productRepository::delete, () -> {
+			throw new ProductNotFoundException("Product  not found!");
+		});
 	}
 
 	@Override
@@ -77,7 +79,10 @@ public class ProductService implements IProductService{
 		
 		 existingProduct.setName(request.getName());
 		 existingProduct.setBrand(request.getBrand());
-		
+		 existingProduct.setPrice(request.getPrice());
+		 existingProduct.setInventory(request.getInventory());
+		 existingProduct.setDescription(request.getDescription());
+		 existingProduct.setCategory(categoryRepository.findByName(request.getCategory().getName()));
 		return existingProduct;
 	}
 
@@ -102,7 +107,7 @@ public class ProductService implements IProductService{
 	@Override
 	public List<Product> getProductsByCategoryNameAndBrand(String category, String brand) {
 		
-		return productRepository.findByCategoryNameAndBrand(category);
+		return productRepository.findByCategoryNameAndBrand(category,brand);
 	}
 
 	@Override
