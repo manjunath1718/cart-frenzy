@@ -1,15 +1,22 @@
 package com.dcw.cartfrenzy.service.product;
 
+
+
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.dcw.cartfrenzy.dto.ImageDto;
+import com.dcw.cartfrenzy.dto.ProductDto;
 import com.dcw.cartfrenzy.exception.ProductNotFoundException;
 import com.dcw.cartfrenzy.exception.ResourceNotFoundException;
 import com.dcw.cartfrenzy.model.Category;
+import com.dcw.cartfrenzy.model.Image;
 import com.dcw.cartfrenzy.model.Product;
 import com.dcw.cartfrenzy.repository.CategoryRepository;
+import com.dcw.cartfrenzy.repository.ImageRepository;
 import com.dcw.cartfrenzy.repository.ProductRepository;
 import com.dcw.cartfrenzy.request.AddProductRequest;
 import com.dcw.cartfrenzy.request.ProductUpdateRequest;
@@ -21,7 +28,9 @@ import lombok.RequiredArgsConstructor;
 public class ProductService implements IProductService{
 	
 	private final ProductRepository productRepository;
-	private final CategoryRepository categoryRepository;
+	private final CategoryRepository categoryRepository;	
+	private final ModelMapper mapper;
+	private final ImageRepository imageRepository;
 	
 	@Override
 	public Product addProduct(AddProductRequest request) {
@@ -126,6 +135,24 @@ public class ProductService implements IProductService{
 	public Long countProductsByBrandAndName(String brand, String name) {
 		
 		return productRepository.countByBrandAndName(brand,name);
+	}
+	
+	@Override
+	public List<ProductDto> getConvertedProducts(List<Product> products){
+		
+		return products.stream().map(this::convertToProductDto).toList();
+	}
+	@Override
+	public ProductDto convertToProductDto(Product product){
+		
+		ProductDto productDto = mapper.map(product, ProductDto.class);
+		
+		List<Image> images = imageRepository.findByProductId(product.getId());
+		List<ImageDto> imageDtos = images.stream()
+				 .map(image->mapper.map(image, ImageDto.class))
+				 .toList();
+		productDto.setImages(imageDtos);
+		return productDto;
 	}
 
 }

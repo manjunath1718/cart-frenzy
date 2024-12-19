@@ -3,6 +3,7 @@ package com.dcw.cartfrenzy.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,6 +35,7 @@ public class Product {
 	@JoinColumn(name = "category_id")
 	private Category category;
 	
+
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<Image> images;
 	
